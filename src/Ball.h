@@ -1,8 +1,6 @@
 #ifndef Ball_h
 #define Ball_h
 
-
-
 #include <stdlib.h>
 #include <SFML/Graphics.hpp>
 constexpr int BALL_WIDTH = 800;
@@ -23,26 +21,17 @@ class Ball : public sf::CircleShape {
  public:
   // Constructors
   Ball();
-
   Ball(float size);
 
-  // Setters and Getters for velocity
   void setVelocity(sf::Vector2f vel);
 
   sf::Vector2f getVelocity();
 
-  // Update the ball's position based on its velocity
-  // Make sure the balls will not go out of the bounds of the window
   void update(const sf::RenderWindow& window);
-
-  // Additional method to set the ball's initial position within bounds
   void setRandomPosition();
-
-    // Check collisions with other balls and deal with it
-    void checkCollisionWithOtherBalls(int indexOfBall, std::vector<Ball>& balls);
-    // Handle velocity of the ball
-    void increaseBallVelocity();
-    void decreaseBallVelocity();
+  void checkCollisionWithOtherBalls(int indexOfBall, std::vector<Ball>& balls);
+  void increaseBallVelocity();
+  void decreaseBallVelocity();
 };
 
 #endif
