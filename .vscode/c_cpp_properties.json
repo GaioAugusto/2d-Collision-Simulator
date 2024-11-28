@@ -1,18 +1,17 @@
 {
   "configurations": [
-      {
-          "name": "Mac",
-          "includePath": [
-              "${workspaceFolder}/**",
-              "/opt/homebrew/Cellar/sfml/2.6.1/include"
-          ],
-          "defines": [],
-          "macFrameworkPath": [],
-          "compilerPath": "/usr/bin/clang++",
-          "cStandard": "c11",
-          "cppStandard": "c++11",
-          "intelliSenseMode": "macos-clang-x64"
-      }
+    {
+      "name": "macos-clang-arm64",
+      "includePath": [
+        "${workspaceFolder}/**"
+      ],
+      "defines": [],
+      "macFrameworkPath": [],
+      "compilerPath": "/usr/bin/clang",
+      "cStandard": "${default}",
+      "cppStandard": "${default}",
+      "intelliSenseMode": "macos-clang-arm64"
+    }
   ],
   "version": 4
 }

@@ -30,28 +30,68 @@ sf::Vector2f Ball::getVelocity() { return velocity; }
 
 // Update the ball's position based on its velocity
 // Make sure the balls will not go out of the bounds of the window
+// void Ball::update(const sf::RenderWindow& window) {
+//     // Move the ball by its current velocity
+//     this->move(velocity);
+
+//     // Get the ball's current position
+//     sf::Vector2f pos = this->getPosition();
+
+//     // Reverse the velocity if the ball hits the window bounds
+//     if (pos.x < 0 || pos.x + 2 * this->getRadius() > window.getSize().x) {
+//       velocity.x = -velocity.x;
+//     }
+//     if (pos.y < 0 || pos.y + 2 * this->getRadius() > window.getSize().y) {
+//       velocity.y = -velocity.y;
+//     }
+// }
+
+// // Additional method to set the ball's initial position within bounds
+// void Ball::setRandomPosition() {
+//     int maxX = BALL_WIDTH - this->getRadius() * 2;
+//     int maxY = BALL_HEIGHT - this->getRadius() * 2;
+//     this->setPosition(std::rand() % maxX + this->getRadius(), std::rand() % maxY + this->getRadius());
+// }
+
+
+
 void Ball::update(const sf::RenderWindow& window) {
     // Move the ball by its current velocity
     this->move(velocity);
 
-    // Get the ball's current position
+    // Get the ball's current position and size
     sf::Vector2f pos = this->getPosition();
+    float radius = this->getRadius();
 
     // Reverse the velocity if the ball hits the window bounds
-    if (pos.x < 0 || pos.x + 2 * this->getRadius() > window.getSize().x) {
-      velocity.x = -velocity.x;
+    if (pos.x <= 0 && velocity.x < 0) {
+        velocity.x = -velocity.x;
     }
-    if (pos.y < 0 || pos.y + 2 * this->getRadius() > window.getSize().y) {
-      velocity.y = -velocity.y;
+    if (pos.x + 2 * radius >= window.getSize().x && velocity.x > 0) {
+        velocity.x = -velocity.x;
+    }
+    if (pos.y <= 0 && velocity.y < 0) {
+        velocity.y = -velocity.y;
+    }
+    if (pos.y + 2 * radius >= window.getSize().y && velocity.y > 0) {
+        velocity.y = -velocity.y;
     }
 }
 
-// Additional method to set the ball's initial position within bounds
 void Ball::setRandomPosition() {
-    int maxX = WIDTH - this->getRadius() * 2;
-    int maxY = HEIGHT - this->getRadius() * 2;
-    this->setPosition(std::rand() % maxX + this->getRadius(), std::rand() % maxY + this->getRadius());
+    float radius = this->getRadius();
+    float maxX = 800 - 2 * radius; // Use window width
+    float maxY = 600 - 2 * radius; // Use window height
+    this->setPosition(std::rand() % static_cast<int>(maxX) + radius,
+                      std::rand() % static_cast<int>(maxY) + radius);
 }
+
+
+
+
+
+
+
 
 // Check collisions with other balls and deal with it
 void Ball::checkCollisionWithOtherBalls(int indexOfBall, std::vector<Ball>& balls) {
@@ -115,4 +155,3 @@ void Ball::decreaseBallVelocity() {
     velocity.x *= 2.f / 3;
     velocity.y *= 2.f / 3;
 }
-

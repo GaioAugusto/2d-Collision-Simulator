@@ -1,75 +1,199 @@
+// #include <SFML/Graphics.hpp>
+// #include "Ball.h"
+// #include "Button.h"
+// #define NUM_OF_BALLS 4
+
+// int main() {
+//     std::srand(std::time(0));  // Seed the random number generator
+
+//     constexpr int WINDOW_WIDTH = 800;
+//     constexpr int WINDOW_HEIGHT = 600;
+//     sf::RenderWindow window(sf::VideoMode(WINDOW_HEIGHT, WINDOW_HEIGHT), "2D Collision Simulator");
+
+//     std::vector<Ball> balls;
+
+//     // Load font
+//     sf::Font font;
+//     if (!font.loadFromFile("/System/Library/Fonts/Supplemental/Arial.ttf")) {
+//         // Error handling
+//         return -1;
+//     }
+
+//     // Create buttons with labels
+//     Button buttonIncreaseV(25, 25, sf::Color::Red, "Increase Velocity", font);
+//     Button buttonDecreaseV(200, 25, sf::Color::Blue, "Decrease Velocity", font);
+//     Button buttonIncreaseNumOfBalls(375, 25, sf::Color::Yellow, "Add Ball", font);
+//     Button buttonDecreaseNumOfBalls(550, 25, sf::Color::Green, "Remove Ball", font);
+
+//     // Initialize balls
+//     for (int counter = 0; counter < NUM_OF_BALLS; counter++) {
+//         Ball newBall(BALL_SIZE);
+//         newBall.setRandomPosition();
+//         balls.push_back(newBall);
+//     }
+
+//     while (window.isOpen()) {
+//         sf::Event event;
+//         while (window.pollEvent(event)) {
+//             if (event.type == sf::Event::Closed)
+//                 window.close();
+
+//             // Handle button clicks
+//             if (event.type == sf::Event::MouseButtonPressed) {
+//                 if (event.mouseButton.button == sf::Mouse::Left) {
+//                     if (buttonIncreaseV.isMouseOver(window)) {
+//                         for (auto& ball : balls) {
+//                             ball.increaseBallVelocity();
+//                         }
+//                     } else if (buttonDecreaseV.isMouseOver(window)) {
+//                         for (auto& ball : balls) {
+//                             ball.decreaseBallVelocity();
+//                         }
+//                     } else if (buttonIncreaseNumOfBalls.isMouseOver(window)) {
+//                         Ball newBall(BALL_SIZE);
+//                         newBall.setRandomPosition();
+//                         if (!balls.empty())
+//                             newBall.setVelocity(balls[0].getVelocity());
+//                         balls.push_back(newBall);
+//                     } else if (buttonDecreaseNumOfBalls.isMouseOver(window)) {
+//                         if (!balls.empty())
+//                             balls.pop_back();
+//                     }
+//                 }
+//             }
+//         }
+
+//         // Update and draw balls
+//         window.clear(sf::Color::Black);
+//         for (int counter = 0; counter < balls.size(); counter++) {
+//             balls[counter].update(window);
+//             balls[counter].checkCollisionWithOtherBalls(counter, balls);
+//             window.draw(balls[counter]);
+//         }
+
+//         // Draw buttons
+//         buttonIncreaseV.draw(window);
+//         buttonDecreaseV.draw(window);
+//         buttonIncreaseNumOfBalls.draw(window);
+//         buttonDecreaseNumOfBalls.draw(window);
+
+//         window.display();
+//     }
+
+//     return 0;
+// }
+
+#include <SFML/Graphics.hpp>
 #include "Ball.h"
 #include "Button.h"
 #define NUM_OF_BALLS 4
+
+enum class GameState {
+    MENU,
+    RUNNING
+};
 
 
 int main() {
     std::srand(std::time(0));  // Seed the random number generator
 
-    sf::RenderWindow window(sf::VideoMode(HEIGHT, WIDTH), "SFML Application");  // Window for the program
-    Ball ball1(50);             // Create a Ball object with diameter 50
-    ball1.setRandomPosition();  // Set a random position within bounds
+    constexpr int WINDOW_WIDTH = 800;
+    constexpr int WINDOW_HEIGHT = 600;
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "2D Collision Simulator");
 
-    std::vector<Ball> balls;  // Declare the vector of balls
+    std::vector<Ball> balls;
 
-    Button buttonIncreaseV(25, 25, sf::Color::Red);
-    Button buttonDecreaseV(75, 25, sf::Color::Blue);
-    Button buttonIncreaseNumOfBalls(WIDTH - 125, 25, sf::Color::Yellow);
-    Button buttonDecreaseNumOfBalls(WIDTH - 75, 25, sf::Color::Green);
+    // Load font
+    sf::Font font;
+    if (!font.loadFromFile("/System/Library/Fonts/Supplemental/Arial.ttf")) {
+        // Error handling
+        return -1;
+    }
 
-  // Loop to populate the vector with the Ball Objects
+    // Game state
+    GameState gameState = GameState::MENU;
+
+    // Create menu start button
+    Button startButton(WINDOW_WIDTH / 2 - 75, WINDOW_HEIGHT / 2 - 25, 150, 50,
+                       sf::Color::Blue, "Start", font);
+
+    // Create buttons with labels for simulation
+    Button buttonIncreaseV(25, 25, 150, 50, sf::Color::Red, "Increase Velocity", font);
+    Button buttonDecreaseV(200, 25, 150, 50, sf::Color::Blue, "Decrease Velocity", font);
+    Button buttonIncreaseNumOfBalls(375, 25, 150, 50, sf::Color::Yellow, "Add Ball", font);
+    Button buttonDecreaseNumOfBalls(550, 25, 150, 50, sf::Color::Green, "Remove Ball", font);
+
+    // Initialize balls
     for (int counter = 0; counter < NUM_OF_BALLS; counter++) {
         Ball newBall(BALL_SIZE);
         newBall.setRandomPosition();
         balls.push_back(newBall);
     }
 
-
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
-        if (event.type == sf::Event::Closed) window.close();
+            if (event.type == sf::Event::Closed)
+                window.close();
 
-        // Deal with button
-        if (event.type == sf::Event::MouseButtonPressed) {
-            if (event.mouseButton.button == sf::Mouse::Left) {
-                auto mousePos = sf::Mouse::getPosition(window);
-                if (buttonIncreaseV.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-                // Button was clicked, perform the action
-                    for (int counter = 0; counter < NUM_OF_BALLS; counter++) {
-                        balls[counter].increaseBallVelocity();
+            if (gameState == GameState::MENU) {
+                // Handle menu interactions
+                if (event.type == sf::Event::MouseButtonPressed) {
+                    if (event.mouseButton.button == sf::Mouse::Left) {
+                        if (startButton.isMouseOver(window)) {
+                            gameState = GameState::RUNNING;
+                        }
                     }
                 }
-                else if (buttonDecreaseV.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-                    for (int counter = 0; counter < NUM_OF_BALLS; counter++) {
-                        balls[counter].decreaseBallVelocity();
+            } else if (gameState == GameState::RUNNING) {
+                // Handle simulation interactions
+                if (event.type == sf::Event::MouseButtonPressed) {
+                    if (event.mouseButton.button == sf::Mouse::Left) {
+                        if (buttonIncreaseV.isMouseOver(window)) {
+                            for (auto& ball : balls) {
+                                ball.increaseBallVelocity();
+                            }
+                        } else if (buttonDecreaseV.isMouseOver(window)) {
+                            for (auto& ball : balls) {
+                                ball.decreaseBallVelocity();
+                            }
+                        } else if (buttonIncreaseNumOfBalls.isMouseOver(window)) {
+                            Ball newBall(BALL_SIZE);
+                            newBall.setRandomPosition();
+                            if (!balls.empty())
+                                newBall.setVelocity(balls[0].getVelocity());
+                            balls.push_back(newBall);
+                        } else if (buttonDecreaseNumOfBalls.isMouseOver(window)) {
+                            if (!balls.empty())
+                                balls.pop_back();
+                        }
                     }
-                }
-                else if (buttonIncreaseNumOfBalls.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-                    Ball newBall(BALL_SIZE);
-                    newBall.setRandomPosition();
-                    newBall.setVelocity(balls[0].getVelocity());
-                    balls.push_back(newBall);
-                }
-                else if (buttonDecreaseNumOfBalls.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
-                    balls.pop_back();
                 }
             }
         }
-    }
-    // Deal with the balls
-    window.clear();
-    for (int counter = 0; counter < balls.size(); counter++) {
-        balls[counter].update(window);
-        balls[counter].checkCollisionWithOtherBalls(counter, balls);
-        window.draw(balls[counter]);
-    }
-    window.draw(buttonIncreaseV);
-    window.draw(buttonDecreaseV);
-    window.draw(buttonIncreaseNumOfBalls);
-    window.draw(buttonDecreaseNumOfBalls);
-    window.display();
-  }
 
-  return 0;
+        window.clear(sf::Color::Black);
+
+        if (gameState == GameState::MENU) {
+            // Draw menu
+            startButton.draw(window);
+        } else if (gameState == GameState::RUNNING) {
+            // Update and draw balls
+            for (int counter = 0; counter < balls.size(); counter++) {
+                balls[counter].update(window);
+                balls[counter].checkCollisionWithOtherBalls(counter, balls);
+                window.draw(balls[counter]);
+            }
+
+            // Draw buttons
+            buttonIncreaseV.draw(window);
+            buttonDecreaseV.draw(window);
+            buttonIncreaseNumOfBalls.draw(window);
+            buttonDecreaseNumOfBalls.draw(window);
+        }
+
+        window.display();
+    }
+
+    return 0;
 }

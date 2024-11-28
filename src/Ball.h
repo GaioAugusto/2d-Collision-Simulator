@@ -5,8 +5,8 @@
 
 #include <stdlib.h>
 #include <SFML/Graphics.hpp>
-#define HEIGHT 800
-#define WIDTH 800
+constexpr int BALL_WIDTH = 800;
+constexpr int BALL_HEIGHT = 800;
 #define VELOCITY 0.1f
 #define NUM_OF_POINTS 200
 #define BALL_SIZE 50
