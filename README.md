@@ -1,6 +1,6 @@
 # **2D Collision Simulator**
 
-A 2D physics simulation that demonstrates elastic collisions between balls. The project features an interactive GUI with controls to adjust the simulation's parameters.
+A 2D physics simulation that demonstrates elastic collisions between objects of equal shape and mass. The project features an interactive GUI with controls to adjust the simulation's parameters.
 
 ---
 
